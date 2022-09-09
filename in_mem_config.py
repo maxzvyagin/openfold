@@ -34,6 +34,7 @@ class FoldingArguments(BaseSettings):
     mgnify_database_path: Path = Path("data/mgnify/mgy_clusters_2018_12.fa")
     bfd_database_path: Path = Path("data/bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt")
     pdb70_database_path: Path = Path("data/pdb70/pdb70")
+    uniclust30_database_path: Path = Path("data/uniclust30/uniclust30_2018_08/uniclust30_2018_08")
     jackhmmer_binary_path: str = "jackhmmer"
     hhblits_binary_path: str = "hhblits"
     hhsearch_binary_path: str = "hhsearch"
