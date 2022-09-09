@@ -31,7 +31,7 @@ class FoldingArguments(BaseSettings):
     openfold_checkpoint_path: Path
     obsolete_pdbs_path: Path
     uniref90_database_path: Path = Path("data/uniref90/uniref90.fasta")
-    mgnify_database_path: Path = Path("data/mgnify/mgy_clusters_2018_12.fa ")
+    mgnify_database_path: Path = Path("data/mgnify/mgy_clusters_2018_12.fa")
     bfd_database_path: Path = Path("data/bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt")
     pdb70_database_path: Path = Path("data/pdb70/pdb70")
     jackhmmer_binary_path: str = "jackhmmer"

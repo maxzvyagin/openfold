@@ -52,9 +52,7 @@ def load_model(config, path, model_device):
 
 def compute_alignments(input_file, tag, alignment_dir, args, local_alignment_dir):
     """Compute alignment for a single sequence"""
-    if args.use_precomputed_alignments is None and not os.path.isdir(
-        local_alignment_dir
-    ):
+    if not os.path.isdir(local_alignment_dir):
         logger.info(f"Generating alignments for {tag}...")
 
         alignment_runner = data_pipeline.AlignmentRunner(
