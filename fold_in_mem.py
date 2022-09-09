@@ -60,11 +60,11 @@ def compute_alignments(input_file, tag, alignment_dir, args, local_alignment_dir
             jackhmmer_binary_path=args.jackhmmer_binary_path,
             hhblits_binary_path=args.hhblits_binary_path,
             hhsearch_binary_path=args.hhsearch_binary_path,
-            uniref90_database_path=args.uniref90_database_path,
-            mgnify_database_path=args.mgnify_database_path,
-            bfd_database_path=args.bfd_database_path,
-            uniclust30_database_path=args.uniclust30_database_path,
-            pdb70_database_path=args.pdb70_database_path,
+            uniref90_database_path=str(args.uniref90_database_path),
+            mgnify_database_path=str(args.mgnify_database_path),
+            bfd_database_path=str(args.bfd_database_path),
+            uniclust30_database_path=str(args.uniclust30_database_path),
+            pdb70_database_path=str(args.pdb70_database_path),
             no_cpus=args.cpus,
         )
         alignment_runner.run(input_file, local_alignment_dir)
