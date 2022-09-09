@@ -1,11 +1,12 @@
 from pydantic import BaseSettings as _BaseSettings
 from pathlib import Path
-from typing import Union, Type
+from typing import Union, Type, TypeVar
 from datetime import date
 import yaml
 import json
 
 PathLike = Union[str, Path]
+_T = TypeVar("_T")
 
 
 class BaseSettings(_BaseSettings):
