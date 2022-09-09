@@ -111,8 +111,6 @@ class FoldingObject:
             os.makedirs(output_dir_base)
         alignment_dir = os.path.join(output_dir_base, "alignments")
         local_alignment_dir = os.path.join(alignment_dir, tag)
-        os.makedirs(local_alignment_dir)
-        # TODO: check if that self.args pass will work
         compute_alignments(
             input_file, tags, alignment_dir, self.args, local_alignment_dir
         )
