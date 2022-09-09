@@ -67,7 +67,7 @@ def compute_alignments(input_file, tag, alignment_dir, args, local_alignment_dir
             pdb70_database_path=str(args.pdb70_database_path),
             no_cpus=args.cpus,
         )
-        alignment_runner.run(input_file, local_alignment_dir)
+        alignment_runner.run(str(input_file), local_alignment_dir)
     else:
         logger.info(f"Using precomputed alignments for {tag} at {alignment_dir}...")
 
