@@ -53,7 +53,6 @@ def load_model(config, path, model_device):
 def compute_alignments(input_file, tag, alignment_dir, args, local_alignment_dir):
     """Compute alignment for a single sequence"""
     if not os.path.isdir(local_alignment_dir):
-        # os.makedirs(local_alignment_dir)
         logger.info(f"Generating alignments for {tag}...")
 
         alignment_runner = data_pipeline.AlignmentRunner(
@@ -67,6 +66,7 @@ def compute_alignments(input_file, tag, alignment_dir, args, local_alignment_dir
             pdb70_database_path=str(args.pdb70_database_path),
             no_cpus=args.cpus,
         )
+        os.makedirs(local_alignment_dir)
         alignment_runner.run(str(input_file), local_alignment_dir)
     else:
         logger.info(f"Using precomputed alignments for {tag} at {alignment_dir}...")
