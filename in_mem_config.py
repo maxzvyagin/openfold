@@ -44,6 +44,8 @@ class FoldingArguments(BaseSettings):
     save_outputs: bool = True  # save pkl files as well as pdbs
     max_template_date: str = date.today().strftime("%Y-%m-%d")
     release_dates_path: str = None
+    subtract_plddt: bool = False
+    cpus: int = 32
 
 if __name__ == "__main__":
     settings = FoldingArguments(

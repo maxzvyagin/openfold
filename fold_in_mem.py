@@ -146,6 +146,7 @@ class FoldingObject:
             self.feature_processor,
             self.args.config_preset,
             self.args.multimer_ri_gap,
+            self.args.subtract_plddt
         )
         unrelaxed_output_path = os.path.join(
             output_dir_base, f"{output_name}_unrelaxed.pdb"
