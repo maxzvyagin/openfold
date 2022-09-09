@@ -27,7 +27,6 @@ class FoldingArguments(BaseSettings):
     """Class for all needed folding object arguments"""
     config_preset: str
     template_mmcif_dir: Path
-    max_template_date: str
     model_device: str
     openfold_checkpoint_path: Path
     obsolete_pdbs_path: Path
@@ -43,13 +42,13 @@ class FoldingArguments(BaseSettings):
     multimer_ri_gap: int = 200  # Residue index offset between multiple sequences, if provided
     skip_relaxation: bool = False  # whether to perform relaxation on output pdb
     save_outputs: bool = True  # save pkl files as well as pdbs
+    max_template_date: str = date.today().strftime("%Y-%m-%d")
     release_dates_path: str = None
 
 if __name__ == "__main__":
     settings = FoldingArguments(
         config_preset="model_1_ptm",
         template_mmcif_dir=Path("data/pdb_mmcif/mmcif_files/"),
-        max_template_date=date.today().strftime("%Y-%m-%d"),
         model_device="cuda:0",
         openfold_checkpoint_path=Path("openfold/resources/openfold_params/finetuning_ptm_2.pt"),
         obsolete_pdbs_path=Path("data/pdb_mmcif/obsolete.dat"),
