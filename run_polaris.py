@@ -20,9 +20,9 @@ def find_workfiles(in_files: List[Union[Path, str]]) -> List[Union[Path, str]]:
     num_gpus = num_nodes * 4
     if num_gpus > 1:
         chunk_size = len(in_files) // num_gpus
-        start_idx = node_rank * chunk_size
+        start_idx = gpu_rank * chunk_size
         end_idx = start_idx + chunk_size
-        if node_rank + 1 == num_gpus:
+        if gpu_rank + 1 == num_gpus:
             end_idx = len(in_files)
 
         print(
