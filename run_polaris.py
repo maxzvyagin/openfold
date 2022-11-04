@@ -36,22 +36,24 @@ def find_workfiles(in_files: List[Union[Path, str]]) -> List[Union[Path, str]]:
 
 
 def run_openfold(in_fasta_dir: Path, out_dir: Path, test: bool = False) -> int:
-    command = f"""python /lus/eagle/projects/CVD-Mol-AI/hippekp/github/openfold/run_pretrained_openfold.py \\
-"{in_fasta_dir}" \\
-/lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/data/pdb_mmcif/mmcif_files/ \\
---uniref90_database_path /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/data/uniref90/uniref90.fasta \\
---mgnify_database_path /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/data/mgnify/mgy_clusters_2018_12.fa \\
---pdb70_database_path /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/data/pdb70/pdb70 \\
---uniclust30_database_path /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/data/uniclust30/uniclust30_2018_08/uniclust30_2018_08 \\
---output_dir "{out_dir}" \\
---bfd_database_path /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/data/bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt \\
---model_device "cuda:{pmi_rank}" \\
---jackhmmer_binary_path /lus/eagle/projects/CVD-Mol-AI/hippekp/conda/envs/voc/bin/jackhmmer \\
---hhblits_binary_path /lus/eagle/projects/CVD-Mol-AI/hippekp/conda/envs/voc/bin/hhblits \\
---hhsearch_binary_path /lus/eagle/projects/CVD-Mol-AI/hippekp/conda/envs/voc/bin/hhsearch \\
---kalign_binary_path /lus/eagle/projects/CVD-Mol-AI/hippekp/conda/envs/voc/bin/kalign \\
---config_preset "model_1_ptm" \\
---openfold_checkpoint_path /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/resources/openfold_params/finetuning_ptm_2.pt"""
+    command = (
+        "python /lus/eagle/projects/CVD-Mol-AI/hippekp/github/openfold/run_pretrained_openfold.py "
+        + f"{in_fasta_dir} "
+        + "/lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/data/pdb_mmcif/mmcif_files/ "
+        + "--uniref90_database_path /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/data/uniref90/uniref90.fasta "
+        + "--mgnify_database_path /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/data/mgnify/mgy_clusters_2018_12.fa "
+        + "--pdb70_database_path /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/data/pdb70/pdb70 "
+        + "--uniclust30_database_path /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/data/uniclust30/uniclust30_2018_08/uniclust30_2018_08 "
+        + f'--output_dir "{out_dir}" '
+        + "--bfd_database_path /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/data/bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt "
+        + f'--model_device "cuda:{pmi_rank}" '
+        + "--jackhmmer_binary_path /lus/eagle/projects/CVD-Mol-AI/hippekp/conda/envs/voc/bin/jackhmmer "
+        + "--hhblits_binary_path /lus/eagle/projects/CVD-Mol-AI/hippekp/conda/envs/voc/bin/hhblits "
+        + "--hhsearch_binary_path /lus/eagle/projects/CVD-Mol-AI/hippekp/conda/envs/voc/bin/hhsearch "
+        + "--kalign_binary_path /lus/eagle/projects/CVD-Mol-AI/hippekp/conda/envs/voc/bin/kalign "
+        + '--config_preset "model_1_ptm" '
+        + "--openfold_checkpoint_path /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/resources/openfold_params/finetuning_ptm_2.pt"
+    )
 
     if test:
         out_dir.mkdir(exist_ok=True, parents=True)
@@ -94,7 +96,7 @@ def main(fasta: Path, out_dir: Path, glob_pattern: str, test: bool):
         file_dir = file.parent
         file_out_dir = out_dir / file_dir.name
 
-        status_code = run_openfold(file_dir, file_out_dir, test)
+        status_code = run_openfold(file, file_out_dir, test)
         if status_code != 0:
             print(f"Error running {file}... continuing")
 
