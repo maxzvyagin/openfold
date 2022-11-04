@@ -96,7 +96,7 @@ def main(fasta: Path, out_dir: Path, glob_pattern: str, test: bool):
         file_dir = file.parent
         file_out_dir = out_dir / file_dir.name
 
-        status_code = run_openfold(file, file_out_dir, test)
+        status_code = run_openfold(file_dir, file_out_dir, test)
         if status_code != 0:
             print(f"Error running {file}... continuing")
 
