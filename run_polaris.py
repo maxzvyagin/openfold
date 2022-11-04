@@ -91,7 +91,7 @@ def main(fasta: Path, out_dir: Path, glob_pattern: str, test: bool):
     node_files = find_workfiles(fasta_files)
 
     for file in node_files:
-        file_dir = file.parent.name
+        file_dir = file.parent
         file_out_dir = out_dir / file_dir
 
         status_code = run_openfold(file_dir, file_out_dir, test)
