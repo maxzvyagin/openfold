@@ -44,9 +44,9 @@ def run_openfold(in_fasta_dir: Path, out_dir: Path, test: bool = False) -> int:
         + "--mgnify_database_path /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/data/mgnify/mgy_clusters_2018_12.fa "
         + "--pdb70_database_path /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/data/pdb70/pdb70 "
         + "--uniclust30_database_path /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/data/uniclust30/uniclust30_2018_08/uniclust30_2018_08 "
-        + f'--output_dir "{out_dir}" '
+        + f"--output_dir {out_dir} "
         + "--bfd_database_path /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/data/bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt "
-        + f'--model_device "cuda:{pmi_rank}" '
+        + f"--model_device cuda:{pmi_rank} "
         + "--jackhmmer_binary_path /lus/eagle/projects/CVD-Mol-AI/hippekp/conda/envs/voc/bin/jackhmmer "
         + "--hhblits_binary_path /lus/eagle/projects/CVD-Mol-AI/hippekp/conda/envs/voc/bin/hhblits "
         + "--hhsearch_binary_path /lus/eagle/projects/CVD-Mol-AI/hippekp/conda/envs/voc/bin/hhsearch "
