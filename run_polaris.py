@@ -51,7 +51,7 @@ def run_openfold(in_fasta_dir: Path, out_dir: Path, test: bool = False) -> int:
         + "--hhblits_binary_path /lus/eagle/projects/CVD-Mol-AI/hippekp/conda/envs/voc/bin/hhblits "
         + "--hhsearch_binary_path /lus/eagle/projects/CVD-Mol-AI/hippekp/conda/envs/voc/bin/hhsearch "
         + "--kalign_binary_path /lus/eagle/projects/CVD-Mol-AI/hippekp/conda/envs/voc/bin/kalign "
-        + '--config_preset "model_1_ptm" '
+        + "--config_preset model_1_ptm "
         + "--openfold_checkpoint_path /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/resources/openfold_params/finetuning_ptm_2.pt"
     )
 
