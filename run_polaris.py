@@ -36,7 +36,7 @@ def find_workfiles(in_files: List[Union[Path, str]]) -> List[Union[Path, str]]:
 
 
 def run_openfold(in_fasta_dir: Path, out_dir: Path, test: bool = False) -> int:
-    command = f"""python run_pretrained_openfold.py \\
+    command = f"""python /lus/eagle/projects/CVD-Mol-AI/hippekp/github/openfold/run_pretrained_openfold.py \\
 "{in_fasta_dir}" \\
 /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/data/pdb_mmcif/mmcif_files/ \\
 --uniref90_database_path /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/data/uniref90/uniref90.fasta \\
