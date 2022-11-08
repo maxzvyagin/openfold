@@ -4,20 +4,49 @@ import os
 from typing import List, Union
 import subprocess
 
-# This assumes we are running in VOC environment...
-# Can change to a more standard fasta reader if we want
-from voc.utils import read_fasta, write_fasta
+from pydantic import BaseModel
 
 node_rank = int(os.environ.get("NODE_RANK", 0))  # zero indexed
-pmi_rank = int(os.environ.get("PMI_LOCAL_RANK", 0))
+pmi_rank = int(os.environ.get("PMI_RANK", 0))
+
+PathLike = Union[Path, str]
 
 
-def find_workfiles(in_files: List[Union[Path, str]]) -> List[Union[Path, str]]:
+class Sequence(BaseModel):
+    sequence: str
+    """Biological sequence (Nucleotide sequence)."""
+    tag: str
+    """Sequence description tag."""
+
+
+def read_fasta(fasta_file: PathLike) -> List[Sequence]:
+    """Caches the last 8 weeks worth of data in memory."""
+    text = Path(fasta_file).read_text()
+    text = re.sub(">$", "", text, flags=re.M)
+    lines = [
+        line.replace("\n", "")
+        for seq in text.split(">")
+        for line in seq.strip().split("\n", 1)
+    ][1:]
+    tags, seqs = lines[::2], lines[1::2]
+
+    return [Sequence(sequence=seq, tag=tag) for seq, tag in zip(seqs, tags)]
+
+
+def write_fasta(
+    sequences: Union[Sequence, List[Sequence]], fasta_file: PathLike, mode: str = "w"
+) -> None:
+    seqs = [sequences] if isinstance(sequences, Sequence) else sequences
+    with open(fasta_file, mode) as f:
+        for seq in seqs:
+            f.write(f">{seq.tag}\n{seq.sequence}\n")
+
+
+def find_workseqs(in_files: List[Sequence]) -> List[Sequence]:
 
     num_nodes = int(os.environ.get("NRANKS", 1))
-
-    gpu_rank = (node_rank * 4) + pmi_rank
     num_gpus = num_nodes * 4
+    gpu_rank = pmi_rank
     if num_gpus > 1:
         chunk_size = len(in_files) // num_gpus
         start_idx = gpu_rank * chunk_size
@@ -26,7 +55,7 @@ def find_workfiles(in_files: List[Union[Path, str]]) -> List[Union[Path, str]]:
             end_idx = len(in_files)
 
         print(
-            f"GPU {gpu_rank}/ {num_gpus} starting at {start_idx}, ending at {end_idx} ({len(in_files)=}"
+            f"GPU {gpu_rank} / {num_gpus} starting at {start_idx}, ending at {end_idx} ({len(in_files)=})"
         )
         node_data = in_files[start_idx:end_idx]
     else:
@@ -70,33 +99,34 @@ def main(fasta: Path, out_dir: Path, glob_pattern: str, test: bool):
     out_dir.mkdir(exist_ok=True, parents=True)
     fasta_temp_dir = out_dir / "tmp_fasta"
     fasta_temp_dir.mkdir(exist_ok=True, parents=True)
-    fasta_files = []
+    seqs = []
     if fasta.is_file():
         # Write each seq to a temp fasta file inside a dir
         for seq in read_fasta(fasta):
-            temp_dir = fasta_temp_dir / seq.tag
-            temp_dir.mkdir(exist_ok=True, parents=True)
-            fasta_temp_file = temp_dir / f"{seq.tag.split('|')[0]}.fasta"
-            write_fasta(seq, fasta_temp_file)
-            fasta_files.append(fasta_temp_file)
+            fasta_temp_file = fasta_temp_dir / f"{seq.tag}.fasta"
+            if not (out_dir / fasta_temp_file.stem).is_dir():
+                seqs.append(seq)
 
     else:  # Is a directory of fasta files
         # Assuming just one seq per fasta file
         for file in fasta.glob(glob_pattern):
             seq = read_fasta(file)[0]  # Here is the one seq assumption
-            temp_dir = fasta_temp_dir / seq.tag
-            temp_dir.mkdir(exist_ok=True, parents=True)
-            fasta_temp_file = temp_dir / f"{seq.tag.split('|')[0]}.fasta"
-            write_fasta(seq, fasta_temp_file)
-            fasta_files.append(fasta_temp_file)
+            fasta_temp_file = fasta_temp_dir / f"{seq.tag}.fasta"
+            if not (out_dir / fasta_temp_file.stem).is_dir():
+                seqs.append(seq)
 
-    node_files = find_workfiles(fasta_files)
+    node_seqs = find_workseqs(seqs)
 
-    for file in node_files:
-        file_dir = file.parent
-        file_out_dir = out_dir / file_dir.name
+    for seq in node_seqs:
+        seq_temp_dir = fasta_temp_dir / seq.tag
+        seq_temp_dir.mkdir(exist_ok=True, parents=True)
+        seq_temp_file = seq_temp_dir / f"{seq.tag}.fasta"
+        if not seq_temp_file.is_file():
+            write_fasta(seq, seq_temp_file)
 
-        status_code = run_openfold(file_dir, file_out_dir, test)
+        file_out_dir = out_dir / seq_temp_dir.name
+
+        status_code = run_openfold(seq_temp_dir, file_out_dir, test)
         if status_code != 0:
             print(f"Error running {file}... continuing")
 
