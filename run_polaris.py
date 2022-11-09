@@ -169,7 +169,9 @@ def main(fasta: Path, out_dir: Path, glob_pattern: str, test: bool, nextclade: b
 
                 rbd_spike_path = rbd_spike_path / "rbd.fasta"
                 write_fasta(seq, rbd_spike_path)
-                print(f"Spike rbd: {rbd_seq} saved to path: {rbd_spike_path}")
+                print(
+                    f"Spike rbd length: {len(rbd_seq.sequence)} saved to path: {rbd_spike_path}"
+                )
             except IndexError:
                 print(f"Nextclade failed on '{seq.tag}'")
 
