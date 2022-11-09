@@ -125,7 +125,7 @@ def main(fasta: Path, out_dir: Path, glob_pattern: str, test: bool):
         if not seq_temp_file.is_file():
             write_fasta(seq, seq_temp_file)
 
-        file_out_dir = out_dir / seq_temp_dir.name
+        file_out_dir = out_dir / seq_temp_file.stem
 
         status_code = run_openfold(seq_temp_dir, file_out_dir, test)
         if status_code != 0:
