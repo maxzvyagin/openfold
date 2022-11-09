@@ -1,3 +1,5 @@
+# NOTICE you should be using the voc environment because this uses nextclade
+
 import re
 from pathlib import Path
 from argparse import ArgumentParser
@@ -43,6 +45,35 @@ def write_fasta(
             f.write(f">{seq.tag}\n{seq.sequence}\n")
 
 
+def get_rbd_region(genome_sequence: Sequence, workdir: Path) -> Sequence:
+    """Given a SARS-CoV-2 genome, run nextclade, get the aligned peptides, and
+    return the RBD region as string"""
+
+    # Save to a temp fasta file in order to run on nextclade
+    genome_fasta = workdir / "genome.fasta"
+    nextclade_outdir = workdir / "nextclade_output"
+    write_fasta(genome_sequence, genome_fasta)
+
+    command = (
+        f"nextclade run --input-dataset /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/nextclade/data/sars-cov-2"
+        f"--output-all {nextclade_outdir} {genome_fasta}"
+    )
+    # Run nextclade
+    subprocess.run(command.split())
+
+    # Extract the peptide string from nextclade
+    seq = read_fasta(nextclade_outdir / "nextclade_gene_S.translation.fasta")[0]
+    peptide = seq.sequence
+    # Isolate the rbd region with pattern
+    rbd = peptide.split("FGE")[-1].split("LSF")[0]
+    # Add back in the leading and trailing pattern
+    rbd = "FGE" + rbd + "LSF"
+    # Replace any ambiguous or gap chars for openfold
+    rbd = rbd.replace("-", "").replace("X", "")
+    seq.sequence = rbd
+    return seq
+
+
 def find_workseqs(in_files: List[Sequence]) -> List[Sequence]:
 
     num_nodes = int(os.environ.get("NRANKS", 1))
@@ -76,7 +107,7 @@ def run_openfold(in_fasta_dir: Path, out_dir: Path, test: bool = False) -> int:
         + "--uniclust30_database_path /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/multinode_data/uniclust30/uniclust30_2018_08/uniclust30_2018_08 "
         + f"--output_dir {out_dir} "
         + "--bfd_database_path /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/multinode_data/bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt "
-        + "--model_device cuda:0 "
+        + f"--model_device cuda:{pmi_rank%4} "
         + "--jackhmmer_binary_path /lus/eagle/projects/CVD-Mol-AI/hippekp/conda/envs/voc/bin/jackhmmer "
         + "--hhblits_binary_path /lus/eagle/projects/CVD-Mol-AI/hippekp/conda/envs/voc/bin/hhblits "
         + "--hhsearch_binary_path /lus/eagle/projects/CVD-Mol-AI/hippekp/conda/envs/voc/bin/hhsearch "
@@ -96,7 +127,7 @@ def run_openfold(in_fasta_dir: Path, out_dir: Path, test: bool = False) -> int:
     return res.returncode
 
 
-def main(fasta: Path, out_dir: Path, glob_pattern: str, test: bool):
+def main(fasta: Path, out_dir: Path, glob_pattern: str, test: bool, nextclade: bool):
     out_dir.mkdir(exist_ok=True, parents=True)
     fasta_temp_dir = out_dir / "tmp_fasta"
     fasta_temp_dir.mkdir(exist_ok=True, parents=True)
@@ -125,6 +156,17 @@ def main(fasta: Path, out_dir: Path, glob_pattern: str, test: bool):
         if not seq_temp_file.is_file():
             write_fasta(seq, seq_temp_file)
 
+        if nextclade:
+            seq = get_rbd_region(seq, seq_temp_dir, test)
+            rbd_spike_path = seq_temp_dir / "rbd"
+            rbd_spike_path.mkdir(exist_ok=True)
+            seq_temp_dir = rbd_spike_path
+
+            rbd_spike_path = rbd_spike_path / "rbd.fasta"
+            write_fasta(seq, rbd_spike_path)
+            if test:
+                print(f"Spike rbd: {seq} at path: {rbd_spike_path}")
+
         file_out_dir = out_dir / seq_temp_file.stem
 
         status_code = run_openfold(seq_temp_dir, file_out_dir, test)
@@ -151,8 +193,14 @@ if __name__ == "__main__":
         help="Glob pattern to search directory for fasta files (defaults to *.fasta)",
         default="*.fasta",
     )
+
+    parser.add_argument(
+        "--nextclade",
+        action="store_true",
+        help="Run nextclade to get RBD region of spike",
+    )
     parser.add_argument("-t", "--test", action="store_true")
 
     args = parser.parse_args()
 
-    main(args.fasta, args.out_dir, args.glob_pattern, args.test)
+    main(args.fasta, args.out_dir, args.glob_pattern, args.test, args.nextclade)
