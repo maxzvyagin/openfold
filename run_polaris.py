@@ -55,7 +55,7 @@ def get_rbd_region(genome_sequence: Sequence, workdir: Path) -> Sequence:
     write_fasta(genome_sequence, genome_fasta)
 
     command = (
-        f"nextclade run --input-dataset /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/nextclade/data/sars-cov-2"
+        f"nextclade run --input-dataset /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/nextclade/data/sars-cov-2 "
         f"--output-all {nextclade_outdir} {genome_fasta}"
     )
     # Run nextclade
