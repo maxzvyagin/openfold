@@ -158,8 +158,12 @@ def main(fasta: Path, out_dir: Path, glob_pattern: str, test: bool, nextclade: b
 
         if nextclade:
             try:
-                seq = get_rbd_region(seq, seq_temp_dir)
-                rbd_spike_path = fasta_temp_dir / f"{seqs.tag}_rbd"
+                # seq = get_rbd_region(seq, seq_temp_dir) (nextclade not working)
+                # 310 to 550 residues
+                rbd = seq.sequence.split("FGE")[-1].split("LSF")[0]
+                rbd_seq = Sequence(sequence=rbd, tag=seq.tag)
+
+                rbd_spike_path = fasta_temp_dir / f"{rbd_seq.tag}_rbd"
                 rbd_spike_path.mkdir(exist_ok=True)
                 seq_temp_dir = rbd_spike_path
 
