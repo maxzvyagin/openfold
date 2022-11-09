@@ -160,7 +160,7 @@ def main(fasta: Path, out_dir: Path, glob_pattern: str, test: bool, nextclade: b
             try:
                 # seq = get_rbd_region(seq, seq_temp_dir) (nextclade not working)
                 # 310 to 550 residues
-                # rbd = seq.sequence.split("FGE")[-1].split("LSF")[0]
+                # rbd = seq.sequence.split("FGE")[-1].split("LSF")[0] (not working giving len=500)
                 rbd = seq.sequence[310:551]
                 rbd_seq = Sequence(sequence=rbd, tag=seq.tag)
 
