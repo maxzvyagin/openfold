@@ -157,15 +157,17 @@ def main(fasta: Path, out_dir: Path, glob_pattern: str, test: bool, nextclade: b
             write_fasta(seq, seq_temp_file)
 
         if nextclade:
-            seq = get_rbd_region(seq, seq_temp_dir)
-            rbd_spike_path = seq_temp_dir / "rbd"
-            rbd_spike_path.mkdir(exist_ok=True)
-            seq_temp_dir = rbd_spike_path
+            try:
+                seq = get_rbd_region(seq, seq_temp_dir)
+                rbd_spike_path = fasta_temp_dir / f"{seqs.tag}_rbd"
+                rbd_spike_path.mkdir(exist_ok=True)
+                seq_temp_dir = rbd_spike_path
 
-            rbd_spike_path = rbd_spike_path / "rbd.fasta"
-            write_fasta(seq, rbd_spike_path)
-            if test:
-                print(f"Spike rbd: {seq} at path: {rbd_spike_path}")
+                rbd_spike_path = rbd_spike_path / "rbd.fasta"
+                write_fasta(seq, rbd_spike_path)
+                print(f"Spike rbd: {seq} saved to path: {rbd_spike_path}")
+            except IndexError:
+                print(f"Nextclade failed on '{seq.tag}'")
 
         file_out_dir = out_dir / seq_temp_file.stem
 
