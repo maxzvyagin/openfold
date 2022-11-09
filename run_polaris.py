@@ -48,7 +48,7 @@ def find_workseqs(in_files: List[Sequence]) -> List[Sequence]:
     num_gpus = num_nodes * 4
     gpu_rank = pmi_rank
     if num_gpus > 1:
-        chunk_size = len(in_files) // num_gpus
+        chunk_size = max(len(in_files) // num_gpus, 1)
         start_idx = gpu_rank * chunk_size
         end_idx = start_idx + chunk_size
         if gpu_rank + 1 == num_gpus:
