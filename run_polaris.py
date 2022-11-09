@@ -115,7 +115,7 @@ def run_openfold(in_fasta_dir: Path, out_dir: Path, test: bool = False) -> int:
         + "--config_preset model_1_ptm "
         + "--openfold_checkpoint_path /lus/eagle/projects/CVD-Mol-AI/hippekp/workflow_data/openfold/resources/openfold_params/finetuning_ptm_2.pt"
     )
-
+    print(command)
     if test:
         out_dir.mkdir(exist_ok=True, parents=True)
         with open(out_dir / "test_out.out", "w") as f:
