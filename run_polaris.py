@@ -157,7 +157,7 @@ def main(fasta: Path, out_dir: Path, glob_pattern: str, test: bool, nextclade: b
             write_fasta(seq, seq_temp_file)
 
         if nextclade:
-            seq = get_rbd_region(seq, seq_temp_dir, test)
+            seq = get_rbd_region(seq, seq_temp_dir)
             rbd_spike_path = seq_temp_dir / "rbd"
             rbd_spike_path.mkdir(exist_ok=True)
             seq_temp_dir = rbd_spike_path
